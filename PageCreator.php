@@ -98,7 +98,7 @@ function wfPppAssignAValue( &$parser, &$cache, &$magicWordId, &$ret ) {
 
                 $pageId = $myArticle->getId();
                 $q0 = "select rev_timestamp from ".$revTable." where rev_page=".$pageId." order by rev_timestamp asc limit 1";
-                if(($res0 = mysql_query($q0)) && ($row0 = mysql_fetch_object($res0)))
+                if(($res0 = $dbr->query($q0)) && ($row0 = $dbr->fetchObject($res0)))
                 {
                   $ret=$row0->rev_timestamp;
 //$ret='coucou';
