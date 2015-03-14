@@ -1,5 +1,17 @@
-
 <?php
+/**
+ * PageCreator extension for MediaWiki
+ *
+ * PHP version 5.4
+ *
+ * @category Extension
+ * @package  PageCreator
+ * @author   Pierro78 <unknown@example.com>
+ * @author   Pierre Rudloff <rudloff@shakepeers.org>
+ * @license  GPL http://www.gnu.org/licenses/gpl.html
+ * @link     https://github.com/ShakePeers/mediawiki-PageCreator
+ * */
+
 
 /**
  * Step 1: choose a magic word ID
@@ -10,107 +22,97 @@
  * Note that the name of the constant and the value it is assigned don't have
  * to have anything to do with each other.
  */
-define( 'PPP_PAGECREATOR', 'PAGECREATOR' );
-define( 'PPP_CREATIONTIMESTAMP', 'CREATIONTIMESTAMP' );
+define('PPP_PAGECREATOR', 'PAGECREATOR');
+define('PPP_CREATIONTIMESTAMP', 'CREATIONTIMESTAMP');
 
 
- 
+
 /**
  * Step 2: define some words to use in wiki markup
  */
 $wgHooks['LanguageGetMagic'][] = 'wfPppWikiWords';
-function wfPppWikiWords( &$magicWords, $langCode ) {
+function wfPppWikiWords( &$magicWords, $langCode )
+{
         // tell MediaWiki that all {{NiftyVar}}, {{NIFTYVAR}}, {{CoolVar}},
         // {{COOLVAR}} and all case variants found in wiki text should be mapped to
         // magic ID 'mycustomvar1' (0 means case-insensitive)
         $magicWords[PPP_PAGECREATOR] = array( 0, PPP_PAGECREATOR);
         $magicWords[PPP_CREATIONTIMESTAMP] = array( 0, PPP_CREATIONTIMESTAMP);
- 
+
         // must do this or you will silence every LanguageGetMagic hook after this!
         return true;
 }
- 
+
 /**
  * Step 3: assign a value to our variable
  */
 $wgHooks['ParserGetVariableValueSwitch'][] = 'wfPppAssignAValue';
-function wfPppAssignAValue( &$parser, &$cache, &$magicWordId, &$ret ) {
-        if ( PPP_PAGECREATOR == $magicWordId ) {
-                        global $wgUser;
-                        $revuser = $wgUser->getName();
+function wfPppAssignAValue( &$parser, &$cache, &$magicWordId, &$ret )
+{
+    if (PPP_PAGECREATOR == $magicWordId ) {
+                    global $wgUser;
+                    $revuser = $wgUser->getName();
 
-                $ret = $revuser;
-               
-                global $wgArticle;
+            $ret = $revuser;
 
-                if (isset($wgArticle))
-                {
-                  $myArticle=$wgArticle;
-                }
-                else
-                {
-                  $myTitle=$parser->getTitle();
-                  $myArticle=new Article($myTitle);
-                }
+            global $wgArticle;
 
-                $dbr = wfGetDB( DB_SLAVE );
-                $revTable = $dbr->tableName( 'revision' );
-
-                $pageId = $myArticle->getId();
-                $q0 = "select rev_user_text from ".$revTable." where rev_page=".$pageId." order by rev_timestamp asc limit 1";
-                if(($res0 = $dbr->query($q0)) && ($row0 = $dbr->fetchObject($res0)))
-                {
-                  $ret=$row0->rev_user_text;
-// $ret= $magicWordId ;
-                }
-                else
-                {
-// try to print a little bit of debug info there
-                  $myTitle=$parser->getTitle();
-                  $articleId=$myTitle->getArticleID();
-//                $ret="pageId:".$pageId."-arcticleId:".$articleId."-getText:".$myTitle->getText()."-getFullText:".$myTitle->getFullText();
-                }
+        if (isset($wgArticle)) {
+            $myArticle=$wgArticle;
+        } else {
+            $myTitle=$parser->getTitle();
+            $myArticle=new Article($myTitle);
         }
 
+            $dbr = wfGetDB(DB_SLAVE);
+            $revTable = $dbr->tableName('revision');
 
-
-
-        if ( PPP_CREATIONTIMESTAMP == $magicWordId ) {
-                        global $wgUser;
-                        $revuser = $wgUser->getName();
-
-                $ret = $revuser;
-               
-                global $wgArticle;
-
-                if (isset($wgArticle))
-                {
-                  $myArticle=$wgArticle;
-                }
-                else
-                {
-                  $myTitle=$parser->getTitle();
-                  $myArticle=new Article($myTitle);
-                }
-
-                $dbr = wfGetDB( DB_SLAVE );
-                $revTable = $dbr->tableName( 'revision' );
-
-                $pageId = $myArticle->getId();
-                $q0 = "select rev_timestamp from ".$revTable." where rev_page=".$pageId." order by rev_timestamp asc limit 1";
-                if(($res0 = $dbr->query($q0)) && ($row0 = $dbr->fetchObject($res0)))
-                {
-                  $ret=$row0->rev_timestamp;
-//$ret='coucou';
-                }
-                else
-                {
-// try to print a little bit of debug info there
-                  $myTitle=$parser->getTitle();
-                  $articleId=$myTitle->getArticleID();
-//                $ret="pageId:".$pageId."-arcticleId:".$articleId."-getText:".$myTitle->getText()."-getFullText:".$myTitle->getFullText();
-                }
+            $pageId = $myArticle->getId();
+            $q0 = "select rev_user_text from ".$revTable." where rev_page=".$pageId." order by rev_timestamp asc limit 1";
+        if (($res0 = $dbr->query($q0)) && ($row0 = $dbr->fetchObject($res0))) {
+            $ret=$row0->rev_user_text;
+            // $ret= $magicWordId ;
+        } else {
+            // try to print a little bit of debug info there
+            $myTitle=$parser->getTitle();
+            $articleId=$myTitle->getArticleID();
+            //                $ret="pageId:".$pageId."-arcticleId:".$articleId."-getText:".$myTitle->getText()."-getFullText:".$myTitle->getFullText();
         }
+    }
+
+
+
+
+    if (PPP_CREATIONTIMESTAMP == $magicWordId ) {
+                    global $wgUser;
+                    $revuser = $wgUser->getName();
+
+            $ret = $revuser;
+
+            global $wgArticle;
+
+        if (isset($wgArticle)) {
+            $myArticle=$wgArticle;
+        } else {
+            $myTitle=$parser->getTitle();
+            $myArticle=new Article($myTitle);
+        }
+
+            $dbr = wfGetDB(DB_SLAVE);
+            $revTable = $dbr->tableName('revision');
+
+            $pageId = $myArticle->getId();
+            $q0 = "select rev_timestamp from ".$revTable." where rev_page=".$pageId." order by rev_timestamp asc limit 1";
+        if (($res0 = $dbr->query($q0)) && ($row0 = $dbr->fetchObject($res0))) {
+            $ret=$row0->rev_timestamp;
+            //$ret='coucou';
+        } else {
+            // try to print a little bit of debug info there
+            $myTitle=$parser->getTitle();
+            $articleId=$myTitle->getArticleID();
+            //                $ret="pageId:".$pageId."-arcticleId:".$articleId."-getText:".$myTitle->getText()."-getFullText:".$myTitle->getFullText();
+        }
+    }
 
 
 
@@ -129,7 +131,7 @@ function wfPppAssignAValue( &$parser, &$cache, &$magicWordId, &$ret ) {
         // true whether we found a value or not.
         return true;
 }
- 
+
 /**
  * Step 4: register the custom variable(s) so that it shows up in
  * Special:Version under the listing of custom variables.
@@ -141,19 +143,20 @@ $wgExtensionCredits['variable'][] = array(
         'description' => 'Provides variables for retrieving the creator of a page an the time stamp of page creation',
         'url' => 'https://www.mediawiki.org/wiki/Extension:PageCreator',
 );
- 
+
 /**
  * Step 5: register wiki markup words associated with
  *         PPP_PAGECREATOR as a variable and not some
  *         other type of magic word
  */
 $wgHooks['MagicWordwgVariableIDs'][] = 'wfPppDeclareVarIds';
-function wfPppDeclareVarIds( &$customVariableIds ) {
+function wfPppDeclareVarIds( &$customVariableIds )
+{
         // $customVariableIds is where MediaWiki wants to store its list of custom
         // variable IDs. We oblige by adding ours:
         $customVariableIds[] = PPP_PAGECREATOR;
         $customVariableIds[] = PPP_CREATIONTIMESTAMP;
- 
+
         // must do this or you will silence every MagicWordwgVariableIds hook
         // registered after this!
         return true;
