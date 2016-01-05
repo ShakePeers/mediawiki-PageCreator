@@ -1,5 +1,5 @@
 {
-	"name": "shakeepers/mediawiki-pagecreator",
+	"name": "shakeepers/page-creator",
 	"description": "Fork of PageCreator extension for MediaWiki",
 	"license": "GPL-2.0",
 	"type": "mediawiki-extension"
